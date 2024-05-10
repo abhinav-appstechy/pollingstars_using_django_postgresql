@@ -1,0 +1,31 @@
+<header class="text-gray-600 body-font">
+    <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+      <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0" href="{% url "homepage" %}">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full" viewBox="0 0 24 24">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+        </svg>
+        <span class="ml-3 text-xl">PollingStars</span>
+      </a>
+      <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center">
+        <a class="mr-5 hover:text-gray-900 {% if activeLink == "Home" %}bg-indigo-700 p-3 text-white rounded-md{% endif %}" href="{% url "homepage" %}">Homepage</a>
+        <a class="mr-5 hover:text-gray-900 {% if activeLink == "AboutUs" %}bg-indigo-700 p-3 text-white rounded-md{% endif %}" href="{% url 'about_us' %}">About Us</a>
+        <a class="mr-5 hover:text-gray-900 {% if activeLink == "ContactUs" %}bg-indigo-700 p-3 text-white rounded-md{% endif %}" href="{% url 'contact_us' %}">Contact Us</a>
+      </nav>
+
+      {% if user.is_authenticated or user_login_status == "logged_in"  %}
+      <form action="{% url 'logout' %}" method="POST">
+      {% csrf_token %}
+      <button class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0" type="submit">Logout
+      </form>
+      </button>
+      {% else %}
+      <button class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0 mx-2"><a href="{% url "login_page" %}">Login</a>
+      </button>
+      <button class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0"><a href="/admin">Admin</a>
+      </button>
+      {% endif %}
+
+
+      
+    </div>
+  </header>

@@ -1,0 +1,304 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>PollingStars</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.0.18/sweetalert2.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+    </style>
+  </head>
+  <body>
+    {% include "header.html" %}
+
+    <div class="mt-10">
+      <h2 class="text-center text-2xl font-bold">{{poll.question}}</h2>
+      <div class="flex justify-center m-auto mx-20 mt-10">
+        <img
+          class="shadow-lg"
+          src="{{poll.image.url}}"
+          height="600px"
+          width="600px"
+        />
+      </div>
+
+      <div class="flex justify-center mt-10">
+        <div
+          class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6"
+        >
+          <div class="flex justify-between items-start w-full">
+            <div class="flex-col items-center">
+              <div class="flex items-center mb-1">
+                {% if is_poll_closed %}
+                <h5
+                  class="text-xl font-bold leading-none text-gray-900 dark:text-white me-1"
+                >
+                  Final Ranking
+                </h5>
+                {% else %}
+                <h5
+                  class="text-xl font-bold leading-none text-gray-900 dark:text-white me-1"
+                >
+                  Current Ranking
+                </h5>
+                {% endif %}
+                
+              </div>
+            </div>
+          </div>
+
+          <!-- Line Chart -->
+          <div class="py-6" id="pie-chart"></div>
+        </div>
+      </div>
+
+      {% if is_poll_closed %}
+        <div class="mt-10">
+
+          <h2 class="text-center text-xl font-bold">Poll Closed!</h2>
+          <h2 class="text-center text-lg font-light mt-5">And the winner is -</h2>
+          <h2 class="text-center text-2xl font-bold">{{winner}}</h2>
+          
+
+        <div>
+      
+      {% else %}
+      <div class="grid grid-cols-2 gap-10 mt-20 mx-40">
+        {% for choice in choices %}
+        {% if is_choice_selected != "no" and is_choice_selected == choice.id %}
+        <button
+          type="button"
+          class="text-white focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-green-300 dark:focus:ring-green-800 shadow-green-500/50 dark:shadow-green-800/80 this-btn-selected"
+          id="{{choice.id}}"
+          onclick="handleChooseOption({{choice.id}})"
+        >
+          {{choice.choice_text}}
+        </button>
+
+        {% else %}
+        <button
+          type="button"
+          class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+          id="{{choice.id}}"
+          onclick="handleChooseOption({{choice.id}})"
+        >
+          {{choice.choice_text}}
+        </button>
+        {% endif %}
+        
+
+        {% endfor %}
+      </div>
+      {% endif %}
+
+    </div>
+
+    {% include "footer.html" %}
+
+    <!-- Include SweetAlert JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.0.18/sweetalert2.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+    <script>
+        let chartInstance = null;
+        let option_data = {{choices1 | safe}}
+        let poll_data = {{poll_data | safe}}
+        console.log(poll_data);
+
+        const getChartOptions = (data) => {
+            console.log("getChartOptions",data[0], data[1])
+          return {
+            series: data[0],
+            colors: ["#1C64F2", "#16BDCA", "#9061F9", "#dd93ac"],
+            chart: {
+              height: 420,
+              width: "100%",
+              type: "pie",
+            },
+            stroke: {
+              colors: ["white"],
+              lineCap: "",
+            },
+            plotOptions: {
+              pie: {
+                labels: {
+                  show: true,
+                },
+                size: "100%",
+                dataLabels: {
+                  offset: -25,
+                },
+              },
+            },
+            labels: data[1],
+            dataLabels: {
+              enabled: true,
+              style: {
+                fontFamily: "Inter, sans-serif",
+              },
+            },
+            legend: {
+              position: "bottom",
+              fontFamily: "Inter, sans-serif",
+            },
+            yaxis: {
+              labels: {
+                formatter: function (value) {
+                  return value;
+                },
+              },
+            },
+            xaxis: {
+              labels: {
+                formatter: function (value) {
+                  return value;
+                },
+              },
+              axisTicks: {
+                show: false,
+              },
+              axisBorder: {
+                show: false,
+              },
+            },
+          };
+        };
+
+        // Function to render the chart
+        const renderChart = (seriesData) => {
+            if (chartInstance !== null) {
+                chartInstance.destroy();
+            }
+            
+            chartInstance = new ApexCharts(
+                document.getElementById("pie-chart"),
+                getChartOptions(seriesData)
+            );
+            chartInstance.render();
+        }
+        
+        // Call renderChart on document load
+        document.addEventListener('DOMContentLoaded', function () {
+            renderChart([
+            [option_data[0].votes, option_data[1].votes, option_data[2].votes, option_data[3].votes], [option_data[0].choice_text, option_data[1].choice_text, option_data[2].choice_text, option_data[3].choice_text]
+            ]);
+
+        });
+
+        function getCsrfToken() {
+            const cookieValue = document.cookie
+              .split("; ")
+              .find((row) => row.startsWith("csrftoken="))
+              .split("=")[1];
+            return cookieValue;
+          }
+
+
+        const handleChooseOption = (id) =>{
+            console.log(id);
+            let prevBtn = document.getElementsByClassName("this-btn-selected")[0];
+            let prevOptionId = "no_id";
+            if(prevBtn){
+              prevOptionId = prevBtn.getAttribute("id");
+            }
+            
+            console.log("prevOptionId",prevOptionId);
+            let csrfToken = getCsrfToken();
+            fetch("{% url 'user_vote' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify({option_id: id, poll_id:poll_data.id, prevOptionId: prevOptionId})
+            })
+            .then((res)=>{
+                return res.json();
+            })
+            .then((data)=>{
+                if(data.status == 200){
+                    console.log(data);
+                    if(Object.keys(data).includes("prev_count")){
+                      option_data.map((item)=>{
+                        if(item.id == id){
+                          item.votes = data.new_count;
+                        }
+                        if(item.id == prevOptionId){
+                          item.votes = data.prev_count;
+                        }
+                    })
+                    } else{
+                      option_data.map((item)=>{
+                        if(item.id == id){
+                            item.votes = data.new_count;
+                        }
+                    })
+                    }
+                    
+
+                    let allBtns = option_data
+
+                    allBtns.map((item)=>{
+                        let btn = document.getElementById(item.id);
+                        btn.classList.remove("bg-gradient-to-r", "from-green-400", "via-green-500", "to-green-600", "hover:bg-gradient-to-br", "focus:ring-green-300", "dark:focus:ring-green-800", "shadow-green-500/50", "dark:shadow-green-800/80", "this-btn-selected");
+                        btn.classList.add("bg-gradient-to-r", "from-blue-500" ,"via-blue-600", "to-blue-700", "hover:bg-gradient-to-br", "focus:ring-blue-300", "dark:focus:ring-blue-800", "shadow-blue-500/50", "dark:shadow-blue-800/80");
+                    })
+
+                    let thatBtn = document.getElementById(id);
+                    thatBtn.classList.remove("bg-gradient-to-r", "from-blue-500" ,"via-blue-600", "to-blue-700", "hover:bg-gradient-to-br", "focus:ring-blue-300", "dark:focus:ring-blue-800", "shadow-blue-500/50", "dark:shadow-blue-800/80");
+                    thatBtn.classList.add("bg-gradient-to-r", "from-green-400", "via-green-500", "to-green-600", "hover:bg-gradient-to-br", "focus:ring-green-300", "dark:focus:ring-green-800", "shadow-green-500/50", "dark:shadow-green-800/80", "this-btn-selected");
+
+                    
+                    const newSeriesData = [[option_data[0].votes, option_data[1].votes, option_data[2].votes, option_data[3].votes], [option_data[0].choice_text, option_data[1].choice_text, option_data[2].choice_text, option_data[3].choice_text]];
+                    console.log(newSeriesData)
+                    renderChart(newSeriesData); // Call renderChart function with updated series data
+
+                    Swal.fire({
+                        title: "",
+                        text: data.message,
+                        icon: "success",
+                        confirmButtonText: "OK",
+                      });
+
+                } else if(data.status == 400 && data.message == "Poll Closed!"){
+                  Swal.fire({
+                    title: "",
+                    text: data.message,
+                    icon: "error",
+                    confirmButtonText: "OK",
+                  });
+
+                  setTimeout(()=>{
+                    window.location.reload();
+                  },1000)
+                } else{
+                  Swal.fire({
+                    title: "",
+                    text: data.message,
+                    icon: "error",
+                    confirmButtonText: "OK",
+                  });
+                }
+            })
+            .catch((error)=>{
+                console.log(error);
+            })
+        }
+    </script>
+  </body>
+</html>

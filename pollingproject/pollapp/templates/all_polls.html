@@ -1,0 +1,33 @@
+{% load static %}
+{% load get_poll_status %}
+
+<div class="bg-gray-50 px-4 py-10 font-[sans-serif] mt-10" id="all-polls">
+    <div class="max-w-7xl max-md:max-w-lg mx-auto">
+      <h2 class="text-3xl font-extrabold text-[#333]">LATEST Polls</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+        {% for poll in all_polls %}
+        <a href="/poll/{{poll.id}}">
+        <div class="bg-white cursor-pointer rounded overflow-hidden group">
+            <div class="relative overflow-hidden">
+              <img src="{{poll.image.url}}" alt="Blog Post 1" class="w-full h-60 object-cover group-hover:scale-125 transition-all duration-300" />
+              <div class="px-4 py-2.5 text-white text-sm tracking-wider bg-orange-500 absolute bottom-0 right-0">{{poll.pub_date | date:"d-m-Y" }}</div>
+            </div>
+            <div class="p-6">
+              {% if poll.id|get_poll_status == "ongoing" %}
+              <span class="bg-teal-700 rounded-lg py-1 px-2 text-white cursor-pointer">Ongoing</span>
+              {% else %}
+              <span class="bg-red-600 rounded-lg py-1 px-2 text-white cursor-pointer">Closed</span>
+              {% endif %}
+
+              
+              <h3 class="text-xl font-bold text-[#333] mt-4">{{poll.question}}</h3>
+              <button type="button" class="px-4 py-2 mt-6 rounded text-white text-sm tracking-wider border-none outline-none bg-orange-500 hover:bg-orange-600 read-more-btn">View Poll</button>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+        
+
+      </div>
+    </div>
+  </div>

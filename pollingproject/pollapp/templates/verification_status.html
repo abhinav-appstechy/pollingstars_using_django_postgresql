@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PollingStars</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.0.18/sweetalert2.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        
+    </style>
+  </head>
+  <body>
+
+    <div class="px-20 mt-20">
+        {% if message == "Verified successfully" %}
+        <div class="flex justify-center">
+        <img src="{% static "/images/user_verified.png" %}" height="200px" width="200px">
+        </div>
+        <h2 id="verify-status" class="text-center text-2xl mt-10">Successfully verified!</h2>
+        {% elif message == "Already verified" %}
+        <div class="flex justify-center">
+        <img src="{% static "/images/already_verified.png" %}" height="200px" width="200px">
+        </div>
+        <h2 id="verify-status" class="text-center text-2xl mt-10">Already verified!</h2>
+        {% else %}
+        <div class="flex justify-center">
+        <img src="{% static "/images/expire.png" %}" height="200px" width="200px">
+        </div>
+        <h2 id="verify-status" class="text-center text-2xl mt-10">Token Expired!</h2>
+        <div class="flex justify-center mt-10">
+        <button id="resend-email" class="bg-indigo-700 p-3 text-white rounded-md hover:cursor-pointer">Resend Verificatin Email</button>
+        </div>
+        {% endif %}
+        
+    </div>
+
+    <!-- Include SweetAlert JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.0.18/sweetalert2.min.js"></script>
+
+
+    <script>
+        function getCsrfToken() {
+            const cookieValue = document.cookie
+              .split("; ")
+              .find((row) => row.startsWith("csrftoken="))
+              .split("=")[1];
+            return cookieValue;
+          }
+
+        let verifyStatus = document.getElementById("verify-status");
+        verifyStatusValue = verifyStatus.innerText;
+        if(verifyStatusValue == "Successfully verified!"){
+            setTimeout(()=>{
+                window.location.href = "{% url 'homepage' %}"
+            }, 2000)
+        } else if(verifyStatusValue == "Already verified!"){
+            setTimeout(()=>{
+                window.location.href = "{% url 'homepage' %}"
+            }, 2000)
+        }
+
+        document.getElementById("resend-email").addEventListener("click", ()=>{
+            let resendEmailBtn = document.getElementById("resend-email");
+            let csrfToken = getCsrfToken();
+            let old_token = window.location.pathname.split("/")[2];
+            resendEmailBtn.innerText = "Resending...";
+            resendEmailBtn.disabled = true;
+            fetch("{% url 'resend_verification_email' %}", {
+                method: "POST",
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({old_token: old_token})
+            })
+            .then((res)=>{
+                return res.json()
+            })
+            .then((data)=>{
+                if(data.status == 200){
+                    Swal.fire({
+                        title: "",
+                        text: data.message,
+                        icon: "success",
+                        confirmButtonText: "OK",
+                      });
+
+                      resendEmailBtn.innerText = "Resend Verificatin Email";
+                      resendEmailBtn.disabled = false;
+
+                    setTimeout(()=>{
+                        window.location.href = "{% url 'homepage' %}"
+                    }, 1500)
+                } else{
+                    Swal.fire({
+                        title: "",
+                        text: data.message,
+                        icon: "error",
+                        confirmButtonText: "OK",
+                      });
+                      resendEmailBtn.innerText = "Resend Verificatin Email";
+                      resendEmailBtn.disabled = false;
+                }
+            })
+
+        })
+
+    </script>
+    
+  </body>
+</html>
