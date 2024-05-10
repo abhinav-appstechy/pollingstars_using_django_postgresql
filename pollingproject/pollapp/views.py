@@ -21,7 +21,7 @@ def send_email(user,email, token):
     url = f"{SITE_URL}/verify/{token}"
     subject = 'Activate Your Account'
     html_message = render_to_string('email_template.html', {'username': user, 'url':url})
-    from_email = 'appstechydev@gmail.com'
+    from_email = 'your_email'
     recipient_list = [email]
 
     send_mail(subject, '', from_email, recipient_list, html_message=html_message)
