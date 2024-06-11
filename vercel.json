@@ -13,6 +13,9 @@
         "src": "/(.*)",
         "dest": "./pollingproject/pollingproject/wsgi.py"
       }
-    ]
+    ],
+    "hooks": {
+    "build": "apt-get update && apt-get install -y libpq-dev"
+  }
   }
   
