@@ -11,7 +11,7 @@
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "./pollingproject/pollingproject/wsgi.py",
+        "dest": "./pollingproject/pollingproject/wsgi.py"
       }
     ]
   }
