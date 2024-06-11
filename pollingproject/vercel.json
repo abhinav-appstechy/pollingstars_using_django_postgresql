@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
       {
-        "src": "./pollingproject/pollingproject/wsgi.py",
+        "src": "pollingproject/pollingproject/wsgi.py",
         "use": "@vercel/python",
         "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
       }
@@ -11,7 +11,7 @@
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "./pollingproject/pollingproject/wsgi.py"
+        "dest": "pollingproject/pollingproject/wsgi.py"
       }
     ]
   }
