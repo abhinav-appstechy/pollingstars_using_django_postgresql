@@ -2,22 +2,15 @@
     "version": 2,
     "builds": [
       {
-        "src": "manage.py",
+        "src": "./pollingproject/pollingproject/wsgi.py",
         "use": "@vercel/python"
-      },
-      {
-        "src": "staticfiles/**/*",
-        "use": "@vercel/static"
       }
+
     ],
     "routes": [
       {
-        "src": "/static/(.*)",
-        "dest": "/staticfiles/$1"
-      },
-      {
         "src": "/(.*)",
-        "dest": "manage.py"
+        "dest": "./pollingproject/pollingproject/wsgi.py",
       }
     ]
   }
