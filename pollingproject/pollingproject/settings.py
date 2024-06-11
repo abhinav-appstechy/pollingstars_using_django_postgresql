@@ -12,6 +12,17 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+EMAILL= os.getenv("EMAILL")
+PASSWORD = os.getenv("PASSWORD")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +37,7 @@ SECRET_KEY = 'django-insecure-^v@f2z&0*vhngaqp15h#k4clvj&wms23++5qoh2@@*nxd8x*wz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','e06e-2405-201-5015-f83c-9892-b79e-fa0e-4124.ngrok-free.app']
+ALLOWED_HOSTS = ['127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ["https://e06e-2405-201-5015-f83c-9892-b79e-fa0e-4124.ngrok-free.app"]
 
 
@@ -79,11 +90,11 @@ WSGI_APPLICATION = 'pollingproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db_name',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432'
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT
     }
 }
 
@@ -143,6 +154,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # SMTP server address
 EMAIL_PORT = 587  # Port for SMTP server (587 for TLS)
 EMAIL_USE_TLS = True  # Use TLS (True for most SMTP servers)
-EMAIL_HOST_USER = 'your_email'  # SMTP username (if required)
-EMAIL_HOST_PASSWORD = 'your_password'  # SMTP password (if required)
+EMAIL_HOST_USER = EMAILL  # SMTP username (if required)
+EMAIL_HOST_PASSWORD = PASSWORD  # SMTP password (if required)
 
